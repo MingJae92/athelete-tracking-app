@@ -1,0 +1,37 @@
+[
+  {
+    "id": "coach_001",
+    "name": "Aisha Khan",
+    "speciality": "Strength & Conditioning",
+    "sport": "Running",
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "coach_002",
+    "name": "Tom Reyes",
+    "speciality": "Physiotherapy",
+    "sport": "Football",
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "coach_003",
+    "name": "Grace Okoye",
+    "speciality": "Sprint Coach",
+    "sport": "Athletics",
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "coach_004",
+    "name": "Marta Silva",
+    "speciality": "Endurance Coach",
+    "sport": "Cycling",
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "coach_005",
+    "name": "Ben Walker",
+    "speciality": "Performance Analysis",
+    "sport": "Multi-sport",
+    "timezone": "Europe/London"
+  }
+]

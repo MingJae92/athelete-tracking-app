@@ -1,0 +1,111 @@
+[
+  {
+    "id": "slot_001",
+    "coachId": "coach_001",
+    "start": "2026-01-06T09:00:00Z",
+    "end": "2026-01-06T09:30:00Z",
+    "status": "available"
+  },
+  {
+    "id": "slot_002",
+    "coachId": "coach_001",
+    "start": "2026-01-06T10:00:00Z",
+    "end": "2026-01-06T10:30:00Z",
+    "status": "available"
+  },
+  {
+    "id": "slot_003",
+    "coachId": "coach_001",
+    "start": "2026-01-07T14:00:00Z",
+    "end": "2026-01-07T14:30:00Z",
+    "status": "booked"
+  },
+
+  {
+    "id": "slot_004",
+    "coachId": "coach_002",
+    "start": "2026-01-06T11:00:00Z",
+    "end": "2026-01-06T11:30:00Z",
+    "status": "available"
+  },
+  {
+    "id": "slot_005",
+    "coachId": "coach_002",
+    "start": "2026-01-07T09:00:00Z",
+    "end": "2026-01-07T09:30:00Z",
+    "status": "available"
+  },
+  {
+    "id": "slot_006",
+    "coachId": "coach_002",
+    "start": "2026-01-08T16:00:00Z",
+    "end": "2026-01-08T16:30:00Z",
+    "status": "available"
+  },
+
+  {
+    "id": "slot_007",
+    "coachId": "coach_003",
+    "start": "2026-01-06T13:00:00Z",
+    "end": "2026-01-06T13:30:00Z",
+    "status": "available"
+  },
+  {
+    "id": "slot_008",
+    "coachId": "coach_003",
+    "start": "2026-01-07T13:00:00Z",
+    "end": "2026-01-07T13:30:00Z",
+    "status": "available"
+  },
+  {
+    "id": "slot_009",
+    "coachId": "coach_003",
+    "start": "2026-01-08T13:00:00Z",
+    "end": "2026-01-08T13:30:00Z",
+    "status": "booked"
+  },
+
+  {
+    "id": "slot_010",
+    "coachId": "coach_004",
+    "start": "2026-01-06T15:00:00Z",
+    "end": "2026-01-06T15:45:00Z",
+    "status": "available"
+  },
+  {
+    "id": "slot_011",
+    "coachId": "coach_004",
+    "start": "2026-01-07T15:00:00Z",
+    "end": "2026-01-07T15:45:00Z",
+    "status": "available"
+  },
+  {
+    "id": "slot_012",
+    "coachId": "coach_004",
+    "start": "2026-01-08T15:00:00Z",
+    "end": "2026-01-08T15:45:00Z",
+    "status": "available"
+  },
+
+  {
+    "id": "slot_013",
+    "coachId": "coach_005",
+    "start": "2026-01-06T08:30:00Z",
+    "end": "2026-01-06T09:00:00Z",
+    "status": "available"
+  },
+  {
+    "id": "slot_014",
+    "coachId": "coach_005",
+    "start": "2026-01-07T08:30:00Z",
+    "end": "2026-01-07T09:00:00Z",
+    "status": "available"
+  },
+  {
+    "id": "slot_015",
+    "coachId": "coach_005",
+    "start": "2026-01-08T08:30:00Z",
+    "end": "2026-01-08T09:00:00Z",
+    "status": "available"
+  }
+]

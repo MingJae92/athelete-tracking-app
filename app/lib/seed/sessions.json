@@ -1,0 +1,18 @@
+[
+  {
+    "id": "session_001",
+    "coachId": "coach_001",
+    "slotId": "slot_003",
+    "athleteIds": ["ath_001", "ath_005"],
+    "notes": "Group strength session – return to training focus",
+    "createdAt": "2025-12-20T09:15:00Z"
+  },
+  {
+    "id": "session_002",
+    "coachId": "coach_003",
+    "slotId": "slot_009",
+    "athleteIds": ["ath_003", "ath_008"],
+    "notes": "Sprint mechanics and block start review",
+    "createdAt": "2025-12-21T14:40:00Z"
+  }
+]
