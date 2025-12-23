@@ -1,14 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Coach as CoachType, getSlotsByCoach, getAthletes, createSession } from '@/app/lib/store';
 
-interface Coach {
+interface TimeSlot {
   id: string;
-  name: string;
-  speciality: string;
-  sport: string;
-  timezone: string;
-  // Removed `slots`
+  status: 'Available' | 'Booked';
 }
 
 interface Athlete {
@@ -16,21 +13,8 @@ interface Athlete {
   name: string;
 }
 
-interface TimeSlot {
-  id: string;
-  status: 'Available' | 'Booked';
-}
-
-interface Session {
-  coachId: string;
-  slotId: string;
-  athleteIds: string[];
-  notes?: string;
-  createdAt: string;
-}
-
 interface CoachDetailProps {
-  coach: Coach;
+  coach: CoachType & { slots: string[] };
 }
 
 export default function CoachDetail({ coach }: CoachDetailProps) {
@@ -43,43 +27,27 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    async function fetchData() {
-      // Fetch athletes
-      const athletesRes = await fetch('/api/athletes');
-      const athletesData: Athlete[] = await athletesRes.json();
-      setAthletes(athletesData);
-
-      // Fetch sessions
-      const sessionsRes = await fetch('/api/sessions');
-      const sessionsData: Session[] = await sessionsRes.json();
-
-      // Generate slots dynamically
-      const allSlots = sessionsData
-        .filter(s => s.coachId === coach.id)
-        .map(s => s.slotId);
-
-      const coachSlots: TimeSlot[] = allSlots.map(slotId => ({
+    // Map coach slots to availability
+    const mappedSlots: TimeSlot[] = coach.slots.map((slotId) => {
+      const slot = getSlotsByCoach(coach.id).find((s) => s.id === slotId);
+      return {
         id: slotId,
-        status: sessionsData.some(
-          s => s.coachId === coach.id && s.slotId === slotId
-        )
-          ? 'Booked'
-          : 'Available',
-      }));
+        status: slot?.status === 'booked' ? 'Booked' : 'Available',
+      };
+    });
+    setSlots(mappedSlots);
 
-      setSlots(coachSlots);
-    }
-
-    fetchData();
+    // Fetch athletes
+    setAthletes(getAthletes());
   }, [coach]);
 
   const handleAthleteToggle = (id: string) => {
-    setSelectedAthletes(prev =>
-      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+    setSelectedAthletes((prev) =>
+      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
     );
   };
 
-  const handleCreateSession = async () => {
+  const handleCreateSession = () => {
     setError('');
     setSuccess('');
 
@@ -87,26 +55,19 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
     if (selectedAthletes.length === 0) return setError('Select at least one athlete');
 
     try {
-      const res = await fetch('/api/sessions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          coachId: coach.id,
-          slotId: selectedSlot,
-          athleteIds: selectedAthletes,
-          notes,
-        }),
+      createSession({
+        coachId: coach.id,
+        slotId: selectedSlot,
+        athleteIds: selectedAthletes,
+        notes,
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Booking failed');
 
       setSuccess('Session successfully created!');
       setSelectedSlot('');
       setSelectedAthletes([]);
       setNotes('');
-      setSlots(prev =>
-        prev.map(s => (s.id === selectedSlot ? { ...s, status: 'Booked' } : s))
+      setSlots((prev) =>
+        prev.map((s) => (s.id === selectedSlot ? { ...s, status: 'Booked' } : s))
       );
     } catch (err: any) {
       setError(err.message);
@@ -115,17 +76,19 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
 
   return (
     <div className="bg-white border border-gray-300 p-6 rounded shadow space-y-6">
+      {/* Coach Profile */}
       <div>
         <h2 className="text-2xl font-semibold">{coach.name}</h2>
-        <p className="text-gray-600">{coach.speciality}</p>
-        <p className="text-gray-600 text-sm">Sport: {coach.sport}</p>
-        <p className="text-gray-600 text-sm">Timezone: {coach.timezone}</p>
+        <p className="text-gray-600">Speciality: {coach.speciality}</p>
+        <p className="text-gray-600">Sport: {coach.sport}</p>
+        <p className="text-gray-600">Timezone: {coach.timezone}</p>
       </div>
 
+      {/* Availability */}
       <div>
         <h3 className="font-semibold mb-2">Availability</h3>
         <div className="grid grid-cols-3 gap-2">
-          {slots.map(slot => (
+          {slots.map((slot) => (
             <button
               key={slot.id}
               disabled={slot.status === 'Booked'}
@@ -141,10 +104,11 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
         </div>
       </div>
 
+      {/* Create Session */}
       <div>
         <h3 className="font-semibold mb-2">Athletes</h3>
         <div className="space-y-2 mb-4">
-          {athletes.map(ath => (
+          {athletes.map((ath) => (
             <label key={ath.id} className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -152,15 +116,15 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
                 onChange={() => handleAthleteToggle(ath.id)}
                 className="w-4 h-4 border-gray-300 mr-2"
               />
-              <span>{ath.name}</span>
+              {ath.name}
             </label>
           ))}
         </div>
 
         <textarea
-          placeholder="Notes..."
+          placeholder="Notes (optional)..."
           value={notes}
-          onChange={e => setNotes(e.target.value)}
+          onChange={(e) => setNotes(e.target.value)}
           className="w-full border border-gray-300 px-3 py-2 mb-4 rounded focus:outline-none focus:border-gray-400"
           rows={3}
         />
