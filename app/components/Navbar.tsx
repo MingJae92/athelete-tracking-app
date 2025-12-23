@@ -12,7 +12,7 @@ export default function NavBar() {
     <>
       {/* Navbar */}
       <div className="w-full fixed top-0 left-0 z-50 bg-base-100 shadow">
-        <div className="flex items-center justify-between px-6 h-16">
+        <div className="flex items-center justify-between px-6 h-16 relative">
           {/* Left: Logo */}
           <div className="flex-1">
             <Link href="/" className="btn btn-ghost normal-case text-xl">
@@ -20,8 +20,8 @@ export default function NavBar() {
             </Link>
           </div>
 
-          {/* Right: Burger Icon */}
-          <div className="flex-none">
+          {/* Right: Burger Icon (visually hidden when menu is open) */}
+          <div className={`flex-none transition-opacity duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
             <button
               onClick={toggleMenu}
               className="btn btn-ghost btn-circle"
@@ -48,13 +48,13 @@ export default function NavBar() {
 
       {/* Sliding Sidebar Menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-base-100 shadow-lg transform transition-transform duration-300 z-40 ${
+        className={`fixed top-0 right-0 h-full w-64 bg-base-100 shadow-lg transform transition-transform duration-300 z-50 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Close button */}
         <div className="flex justify-end p-4">
-          <button onClick={toggleMenu} className="btn btn-ghost">
+          <button onClick={toggleMenu} className="btn btn-ghost btn-circle">
             ✕
           </button>
         </div>
