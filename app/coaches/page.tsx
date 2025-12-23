@@ -1,5 +1,6 @@
 import NavBar from "@/app/components/Navbar";
 import CoachDetail from "@/app/components/CoachDetail";
+import CoachList from "../components/CoachList";
 
 export default function CoachesPage() {
   return (
@@ -8,7 +9,8 @@ export default function CoachesPage() {
         <NavBar/>
         <h1 className="text-4xl font-light text-gray-700 mb-6">Coaches</h1>
         <p>View all coaches and their availability</p>
-        <CoachDetail/>
+        <CoachList/>
+   
       </div>
     </div>
   );
