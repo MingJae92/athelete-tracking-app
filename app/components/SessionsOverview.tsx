@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { coaches, athletes } from "@/app/lib/store";
+import SessionModal from "./SessionModal"; // import the modal
 
 type Session = {
   id: string;
@@ -46,16 +47,11 @@ export default function SessionsPage() {
       .map((id) => athletes.find((a) => a.id === id)?.name || "Unknown")
       .join(", ");
 
-  const getAthleteDetails = (ids: string[]) =>
-    ids.map((id) => athletes.find((a) => a.id === id) || { name: "Unknown", sport: "-", squad: "-" });
-
   const filteredSessions = sessions.filter((s) => {
     const matchesCoach = filterCoach
       ? getCoachName(s.coachId).toLowerCase().includes(filterCoach.toLowerCase())
       : true;
-    const matchesDate = filterDate
-      ? s.createdAt.startsWith(filterDate)
-      : true;
+    const matchesDate = filterDate ? s.createdAt.startsWith(filterDate) : true;
     return matchesCoach && matchesDate;
   });
 
@@ -90,9 +86,8 @@ export default function SessionsPage() {
           return (
             <div
               key={session.id}
-              className={`border rounded p-4 shadow-sm hover:shadow-md transition cursor-pointer ${
-                isToday ? "bg-yellow-50" : "bg-white"
-              }`}
+              className={`border rounded p-4 shadow-sm hover:shadow-md transition cursor-pointer ${isToday ? "bg-yellow-50" : "bg-white"
+                }`}
               onClick={() => setSelectedSession(session)}
             >
               <div className="flex justify-between mb-2">
@@ -118,39 +113,12 @@ export default function SessionsPage() {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Render Modal */}
       {selectedSession && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          onClick={() => setSelectedSession(null)} // close modal when clicking overlay
-        >
-          <div
-            className="bg-white rounded p-6 w-full max-w-lg shadow-lg relative"
-            onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
-          >
-            <button
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-              onClick={() => setSelectedSession(null)}
-            >
-              ✕
-            </button>
-            <h2 className="text-xl font-bold mb-4">
-              {getCoachName(selectedSession.coachId)} -{" "}
-              {new Date(selectedSession.createdAt).toLocaleString()}
-            </h2>
-            <p className="mb-4">
-              <strong>Notes:</strong> {selectedSession.notes || "No notes provided"}
-            </p>
-            <h3 className="font-semibold mb-2">Athletes:</h3>
-            <ul className="list-disc pl-5 space-y-1">
-              {getAthleteDetails(selectedSession.athleteIds).map((ath, i) => (
-                <li key={i}>
-                  <strong>{ath.name}</strong> - {ath.sport} ({ath.squad})
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        <SessionModal
+          session={selectedSession}
+          onClose={() => setSelectedSession(null)}
+        />
       )}
     </div>
   );
