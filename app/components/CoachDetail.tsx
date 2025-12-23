@@ -1,11 +1,14 @@
-// app/components/CoachDetail.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-interface TimeSlot {
-  time: string;
-  status: 'Available' | 'Booked';
+interface Coach {
+  id: string;
+  name: string;
+  speciality: string;
+  sport: string;
+  timezone: string;
+  // Removed `slots`
 }
 
 interface Athlete {
@@ -13,142 +16,164 @@ interface Athlete {
   name: string;
 }
 
-export default function CoachDetail() {
+interface TimeSlot {
+  id: string;
+  status: 'Available' | 'Booked';
+}
+
+interface Session {
+  coachId: string;
+  slotId: string;
+  athleteIds: string[];
+  notes?: string;
+  createdAt: string;
+}
+
+interface CoachDetailProps {
+  coach: Coach;
+}
+
+export default function CoachDetail({ coach }: CoachDetailProps) {
+  const [slots, setSlots] = useState<TimeSlot[]>([]);
+  const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [selectedSlot, setSelectedSlot] = useState('');
   const [selectedAthletes, setSelectedAthletes] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  // Mock data - replace with actual API call
-  const coach = {
-    name: 'Aisha Khan',
-    specialty: 'Strength & Conditioning',
-    timezone: 'PST'
-  };
+  useEffect(() => {
+    async function fetchData() {
+      // Fetch athletes
+      const athletesRes = await fetch('/api/athletes');
+      const athletesData: Athlete[] = await athletesRes.json();
+      setAthletes(athletesData);
 
-  const timeSlots: TimeSlot[] = [
-    { time: '09:00', status: 'Available' },
-    { time: '10:00', status: 'Booked' },
-    { time: '14:00', status: 'Available' }
-  ];
+      // Fetch sessions
+      const sessionsRes = await fetch('/api/sessions');
+      const sessionsData: Session[] = await sessionsRes.json();
 
-  const athletes: Athlete[] = [
-    { id: '1', name: 'Maya Patel' },
-    { id: '2', name: 'Lewis Grant' },
-    { id: '3', name: 'Sofia Novak' }
-  ];
+      // Generate slots dynamically
+      const allSlots = sessionsData
+        .filter(s => s.coachId === coach.id)
+        .map(s => s.slotId);
 
-  const handleAthleteToggle = (athleteId: string) => {
+      const coachSlots: TimeSlot[] = allSlots.map(slotId => ({
+        id: slotId,
+        status: sessionsData.some(
+          s => s.coachId === coach.id && s.slotId === slotId
+        )
+          ? 'Booked'
+          : 'Available',
+      }));
+
+      setSlots(coachSlots);
+    }
+
+    fetchData();
+  }, [coach]);
+
+  const handleAthleteToggle = (id: string) => {
     setSelectedAthletes(prev =>
-      prev.includes(athleteId)
-        ? prev.filter(id => id !== athleteId)
-        : [...prev, athleteId]
+      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
     );
   };
 
-  const handleCreateSession = () => {
-    if (!selectedSlot) {
-      setError('Please select a time slot');
-      return;
+  const handleCreateSession = async () => {
+    setError('');
+    setSuccess('');
+
+    if (!selectedSlot) return setError('Select a slot');
+    if (selectedAthletes.length === 0) return setError('Select at least one athlete');
+
+    try {
+      const res = await fetch('/api/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          coachId: coach.id,
+          slotId: selectedSlot,
+          athleteIds: selectedAthletes,
+          notes,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Booking failed');
+
+      setSuccess('Session successfully created!');
+      setSelectedSlot('');
+      setSelectedAthletes([]);
+      setNotes('');
+      setSlots(prev =>
+        prev.map(s => (s.id === selectedSlot ? { ...s, status: 'Booked' } : s))
+      );
+    } catch (err: any) {
+      setError(err.message);
     }
-    if (selectedAthletes.length === 0) {
-      setError('Please select at least one athlete');
-      return;
-    }
-    // Handle session creation
-    console.log({ selectedSlot, selectedAthletes, notes });
   };
 
   return (
-    <div className="bg-white border border-gray-300 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-light text-gray-700 mb-1">{coach.name}</h2>
-          <p className="text-gray-600 font-light">{coach.specialty}</p>
-          <p className="text-gray-600 font-light text-sm">Timezone: {coach.timezone}</p>
-        </div>
-        <button className="p-2 hover:bg-gray-100 rounded transition">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
+    <div className="bg-white border border-gray-300 p-6 rounded shadow space-y-6">
+      <div>
+        <h2 className="text-2xl font-semibold">{coach.name}</h2>
+        <p className="text-gray-600">{coach.speciality}</p>
+        <p className="text-gray-600 text-sm">Sport: {coach.sport}</p>
+        <p className="text-gray-600 text-sm">Timezone: {coach.timezone}</p>
       </div>
 
-      {/* Availability */}
-      <div className="mb-8">
-        <h3 className="text-lg font-normal text-gray-700 mb-4">Availability</h3>
-        <div className="space-y-2">
-          {timeSlots.map((slot) => (
-            <div
-              key={slot.time}
-              className="flex items-center justify-between py-2 border-b border-gray-200"
+      <div>
+        <h3 className="font-semibold mb-2">Availability</h3>
+        <div className="grid grid-cols-3 gap-2">
+          {slots.map(slot => (
+            <button
+              key={slot.id}
+              disabled={slot.status === 'Booked'}
+              onClick={() => setSelectedSlot(slot.id)}
+              className={`py-2 px-3 border rounded text-sm font-medium transition
+                ${slot.status === 'Booked' ? 'bg-red-100 text-red-600 cursor-not-allowed' : ''}
+                ${selectedSlot === slot.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
+              `}
             >
-              <span className="text-gray-700 font-light">{slot.time}</span>
-              <span className={`font-light ${slot.status === 'Available' ? 'text-gray-700' : 'text-gray-500'}`}>
-                {slot.status}
-              </span>
-            </div>
+              {slot.id} {slot.status === 'Booked' ? '(Booked)' : ''}
+            </button>
           ))}
         </div>
       </div>
 
-      {/* Create Session */}
       <div>
-        <h3 className="text-lg font-normal text-gray-700 mb-4">Create Session</h3>
-
-        {/* Time Slot Selector */}
-        <select
-          value={selectedSlot}
-          onChange={(e) => setSelectedSlot(e.target.value)}
-          className="w-full border border-gray-300 px-4 py-2 mb-4 focus:outline-none focus:border-gray-400 text-gray-700 font-light"
-        >
-          <option value="">Select Slot ▼</option>
-          {timeSlots
-            .filter(slot => slot.status === 'Available')
-            .map(slot => (
-              <option key={slot.time} value={slot.time}>
-                {slot.time}
-              </option>
-            ))}
-        </select>
-
-        {/* Athletes Checkboxes */}
-        <div className="space-y-3 mb-4">
-          {athletes.map((athlete) => (
-            <label key={athlete.id} className="flex items-center cursor-pointer">
+        <h3 className="font-semibold mb-2">Athletes</h3>
+        <div className="space-y-2 mb-4">
+          {athletes.map(ath => (
+            <label key={ath.id} className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                checked={selectedAthletes.includes(athlete.id)}
-                onChange={() => handleAthleteToggle(athlete.id)}
-                className="w-4 h-4 border-gray-300 mr-3"
+                checked={selectedAthletes.includes(ath.id)}
+                onChange={() => handleAthleteToggle(ath.id)}
+                className="w-4 h-4 border-gray-300 mr-2"
               />
-              <span className="text-gray-700 font-light">{athlete.name}</span>
+              <span>{ath.name}</span>
             </label>
           ))}
         </div>
 
-        {/* Notes */}
         <textarea
           placeholder="Notes..."
           value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          className="w-full border border-gray-300 px-4 py-2 mb-4 focus:outline-none focus:border-gray-400 font-light"
+          onChange={e => setNotes(e.target.value)}
+          className="w-full border border-gray-300 px-3 py-2 mb-4 rounded focus:outline-none focus:border-gray-400"
           rows={3}
         />
 
-        {/* Create Button */}
         <button
           onClick={handleCreateSession}
-          className="w-full bg-gray-600 text-white py-3 hover:bg-gray-700 transition font-light"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
         >
           Create Session
         </button>
 
-        {/* Error Message */}
-        {error && (
-          <p className="text-sm text-gray-600 italic mt-2">{error}</p>
-        )}
+        {error && <p className="text-red-600 mt-2 text-sm">{error}</p>}
+        {success && <p className="text-green-600 mt-2 text-sm">{success}</p>}
       </div>
     </div>
   );

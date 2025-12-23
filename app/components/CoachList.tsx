@@ -1,6 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import Link from 'next/link';
+import { getSlotsByCoach } from '@/app/lib/store';
 
 export interface Coach {
   id: string;
@@ -17,34 +19,35 @@ interface CoachListProps {
 
 export default function CoachList({ coaches }: CoachListProps) {
   const [search, setSearch] = useState('');
-  const [selectedCoachId, setSelectedCoachId] = useState<string | null>(null);
+  const [coachesWithSlots, setCoachesWithSlots] = useState<Coach[]>([]);
+
+  useEffect(() => {
+    // Map each coach to their next available slot
+    const mapped = coaches.map((coach) => {
+      const slots = getSlotsByCoach(coach.id)
+        .filter((s) => s.status === 'available')
+        .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+
+      return {
+        ...coach,
+        nextAvailableSlot: slots.length > 0 ? slots[0].start : undefined,
+      };
+    });
+
+    setCoachesWithSlots(mapped);
+  }, [coaches]);
 
   const filteredCoaches = useMemo(() => {
-    return coaches.filter((coach) =>
+    return coachesWithSlots.filter((coach) =>
       coach.name.toLowerCase().includes(search.toLowerCase())
     );
-  }, [coaches, search]);
+  }, [coachesWithSlots, search]);
 
   return (
-    <div className="bg-white border border-gray-300 p-6">
+    <div className="bg-white border border-gray-300 p-6 rounded-lg">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-light text-gray-700">Coaches</h2>
-        <button className="p-2 hover:bg-gray-100 rounded transition">
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
       </div>
 
       {/* Search */}
@@ -53,7 +56,7 @@ export default function CoachList({ coaches }: CoachListProps) {
         placeholder="Search by coach name..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full border border-gray-300 px-4 py-2 mb-6 focus:outline-none focus:border-gray-400 text-gray-700 font-light"
+        className="w-full border border-gray-300 px-4 py-2 mb-6 focus:outline-none focus:border-gray-400 text-gray-700 font-light rounded"
       />
 
       {/* Empty state */}
@@ -63,40 +66,22 @@ export default function CoachList({ coaches }: CoachListProps) {
 
       {/* Coach List */}
       <div className="space-y-4">
-        {filteredCoaches.map((coach) => {
-          const isSelected = coach.id === selectedCoachId;
-
-          return (
-            <div
-              key={coach.id}
-              onClick={() => setSelectedCoachId(coach.id)}
-              className={`border p-4 cursor-pointer transition
-                ${isSelected
-                  ? 'border-gray-500 bg-gray-50'
-                  : 'border-gray-200 hover:bg-gray-50'
-                }
-              `}
-            >
-              <h3 className="text-lg font-light text-gray-700 mb-1">
-                {coach.name}
-              </h3>
-
-              <p className="text-sm text-gray-600 font-light">
-                {coach.speciality}
+        {filteredCoaches.map((coach) => (
+          <Link
+            key={coach.id}
+            href={`/coaches/${coach.id}`}
+            className="block border p-4 rounded transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <h3 className="text-lg font-light text-gray-700 mb-1">{coach.name}</h3>
+            <p className="text-sm text-gray-600 font-light">{coach.speciality}</p>
+            <p className="text-sm text-gray-600 font-light">Sport: {coach.sport}</p>
+            {coach.nextAvailableSlot && (
+              <p className="text-sm text-gray-600 font-light mt-2">
+                Next slot: {new Date(coach.nextAvailableSlot).toLocaleString()}
               </p>
-
-              <p className="text-sm text-gray-600 font-light">
-                Sport: {coach.sport}
-              </p>
-
-              {coach.nextAvailableSlot && (
-                <p className="text-sm text-gray-600 font-light mt-2">
-                  Next slot: {coach.nextAvailableSlot}
-                </p>
-              )}
-            </div>
-          );
-        })}
+            )}
+          </Link>
+        ))}
       </div>
     </div>
   );
