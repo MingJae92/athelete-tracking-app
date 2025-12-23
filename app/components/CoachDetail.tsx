@@ -97,6 +97,7 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
                 ${slot.status === 'Booked' ? 'bg-red-100 text-red-600 cursor-not-allowed' : ''}
                 ${selectedSlot === slot.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
               `}
+              aria-pressed={selectedSlot === slot.id} // ✅ accessibility for toggle
             >
               {slot.id} {slot.status === 'Booked' ? '(Booked)' : ''}
             </button>
@@ -115,13 +116,16 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
                 checked={selectedAthletes.includes(ath.id)}
                 onChange={() => handleAthleteToggle(ath.id)}
                 className="w-4 h-4 border-gray-300 mr-2"
+                aria-checked={selectedAthletes.includes(ath.id)} // ✅ accessibility
               />
               {ath.name}
             </label>
           ))}
         </div>
 
+        <label htmlFor="notes" className="sr-only">Notes</label> {/* ✅ screen reader label */}
         <textarea
+          id="notes"
           placeholder="Notes (optional)..."
           value={notes}
           onChange={(e) => setNotes(e.target.value)}

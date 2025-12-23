@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { coaches, athletes } from "@/app/lib/store";
-import SessionModal from "./SessionModal"; // import the modal
+import { useEffect, useState } from 'react';
+import { coaches, athletes } from '@/app/lib/store';
+import SessionModal from './SessionModal';
 
 type Session = {
   id: string;
@@ -15,15 +15,15 @@ type Session = {
 
 export default function SessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [filterCoach, setFilterCoach] = useState("");
-  const [filterDate, setFilterDate] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [filterCoach, setFilterCoach] = useState('');
+  const [filterDate, setFilterDate] = useState('');
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
 
   useEffect(() => {
     async function fetchSessions() {
       try {
-        const res = await fetch("/api/sessions");
+        const res = await fetch('/api/sessions');
         const data = await res.json();
         const sorted = data.sort(
           (a: Session, b: Session) =>
@@ -31,7 +31,7 @@ export default function SessionsPage() {
         );
         setSessions(sorted);
       } catch (err) {
-        console.error("Failed to fetch sessions", err);
+        console.error('Failed to fetch sessions', err);
       } finally {
         setLoading(false);
       }
@@ -40,12 +40,12 @@ export default function SessionsPage() {
   }, []);
 
   const getCoachName = (id: string) =>
-    coaches.find((c) => c.id === id)?.name || "Unknown Coach";
+    coaches.find((c) => c.id === id)?.name || 'Unknown Coach';
 
   const getAthleteNames = (ids: string[]) =>
     ids
-      .map((id) => athletes.find((a) => a.id === id)?.name || "Unknown")
-      .join(", ");
+      .map((id) => athletes.find((a) => a.id === id)?.name || 'Unknown')
+      .join(', ');
 
   const filteredSessions = sessions.filter((s) => {
     const matchesCoach = filterCoach
@@ -63,42 +63,50 @@ export default function SessionsPage() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <label className="sr-only" htmlFor="filter-coach">Filter by coach</label>
         <input
+          id="filter-coach"
           type="text"
-          placeholder="Filter by coach"
+          placeholder="Filter by coach name..."
           value={filterCoach}
           onChange={(e) => setFilterCoach(e.target.value)}
-          className="border rounded px-2 py-1 flex-1"
+          className="border rounded px-2 py-1 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
+
+        <label className="sr-only" htmlFor="filter-date">Filter by date</label>
         <input
+          id="filter-date"
           type="date"
           value={filterDate}
           onChange={(e) => setFilterDate(e.target.value)}
-          className="border rounded px-2 py-1"
+          className="border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </div>
 
       {/* Sessions List */}
       <div className="space-y-4">
+        {filteredSessions.length === 0 && (
+          <p className="text-gray-500">No sessions found.</p>
+        )}
+
         {filteredSessions.map((session) => {
           const isToday =
             new Date(session.createdAt).toDateString() === new Date().toDateString();
           return (
             <div
               key={session.id}
-              className={`border rounded p-4 shadow-sm hover:shadow-md transition cursor-pointer ${isToday ? "bg-yellow-50" : "bg-white"
-                }`}
+              tabIndex={0} // focusable for keyboard
+              className={`border rounded p-4 shadow-sm hover:shadow-md transition cursor-pointer ${isToday ? 'bg-yellow-50' : 'bg-white'}`}
               onClick={() => setSelectedSession(session)}
+              onKeyDown={(e) => e.key === 'Enter' && setSelectedSession(session)}
+              aria-label={`Session with ${getCoachName(session.coachId)} on ${new Date(session.createdAt).toLocaleString()}`}
             >
               <div className="flex justify-between mb-2">
-                <span className="font-semibold">
-                  {new Date(session.createdAt).toLocaleString()}
-                </span>
+                <span className="font-semibold">{new Date(session.createdAt).toLocaleString()}</span>
                 <span className="italic">{getCoachName(session.coachId)}</span>
               </div>
               <div className="mb-2">
-                <strong>Athletes ({session.athleteIds.length}):</strong>{" "}
-                {getAthleteNames(session.athleteIds)}
+                <strong>Athletes ({session.athleteIds.length}):</strong> {getAthleteNames(session.athleteIds)}
               </div>
               {session.notes && (
                 <div className="text-gray-600">
@@ -108,9 +116,6 @@ export default function SessionsPage() {
             </div>
           );
         })}
-        {filteredSessions.length === 0 && (
-          <p className="text-gray-500">No sessions found.</p>
-        )}
       </div>
 
       {/* Render Modal */}

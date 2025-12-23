@@ -23,10 +23,20 @@ export default function SessionModal({ session, onClose }: Props) {
   const getAthleteDetails = (ids: string[]) =>
     ids.map((id) => athletes.find((a) => a.id === id) || { name: "Unknown", sport: "-", squad: "-" });
 
+  // Handle keyboard navigation (Escape to close)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Escape") onClose();
+  };
+
   return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
       onClick={onClose} // close modal when clicking overlay
+      onKeyDown={handleKeyDown} // ✅ keyboard support
+      role="dialog" // ✅ accessibility role
+      aria-modal="true" // ✅ screen reader
+      aria-labelledby="modal-title" // ✅ links to title
+      tabIndex={-1} // ✅ focusable container for keyboard
     >
       <div
         className="bg-white rounded p-6 w-full max-w-lg shadow-lg relative"
@@ -35,10 +45,11 @@ export default function SessionModal({ session, onClose }: Props) {
         <button
           className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
           onClick={onClose}
+          aria-label="Close modal" // ✅ accessibility label
         >
           ✕
         </button>
-        <h2 className="text-xl font-bold mb-4">
+        <h2 id="modal-title" className="text-xl font-bold mb-4">
           {getCoachName(session.coachId)} - {new Date(session.createdAt).toLocaleString()}
         </h2>
         <p className="mb-4">
