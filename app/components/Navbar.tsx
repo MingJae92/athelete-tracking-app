@@ -11,12 +11,12 @@ export default function NavBar() {
   return (
     <>
       {/* Navbar */}
-      <div className="w-full fixed top-0 left-0 z-50 bg-base-100 shadow">
+      <div className="w-full fixed top-0 left-0 z-50 bg-white border-b border-gray-300 shadow-sm">
         <div className="flex items-center justify-between px-6 h-16 relative">
           {/* Left: Logo */}
           <div className="flex-1">
-            <Link href="/" className="btn btn-ghost normal-case text-xl">
-              MyApp
+            <Link href="/" className="text-xl font-light text-gray-700">
+              Cloudathlete
             </Link>
           </div>
 
@@ -24,7 +24,7 @@ export default function NavBar() {
           <div className={`flex-none transition-opacity duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
             <button
               onClick={toggleMenu}
-              className="btn btn-ghost btn-circle"
+              className="p-2 hover:bg-gray-100 rounded transition"
               aria-label="Menu"
             >
               <svg
@@ -48,36 +48,52 @@ export default function NavBar() {
 
       {/* Sliding Sidebar Menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-base-100 shadow-lg transform transition-transform duration-300 z-50 ${
+        className={`fixed top-0 right-0 h-full w-64 bg-gray-800 text-white shadow-2xl transform transition-transform duration-300 z-50 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Close button */}
         <div className="flex justify-end p-4">
-          <button onClick={toggleMenu} className="btn btn-ghost btn-circle">
+          <button onClick={toggleMenu} className="p-2 hover:bg-gray-700 rounded transition text-white">
             ✕
           </button>
         </div>
 
         {/* Menu links */}
-        <ul className="menu p-4 space-y-2">
+        <ul className="p-4 space-y-2">
           <li>
-            <Link href="/coach" onClick={toggleMenu}>
+            <Link 
+              href="/coach" 
+              onClick={toggleMenu}
+              className="block px-4 py-3 hover:bg-gray-700 rounded transition font-light"
+            >
               Coach
             </Link>
           </li>
           <li>
-            <Link href="/sessions" onClick={toggleMenu}>
+            <Link 
+              href="/sessions" 
+              onClick={toggleMenu}
+              className="block px-4 py-3 hover:bg-gray-700 rounded transition font-light"
+            >
               Sessions
             </Link>
           </li>
           <li>
-            <Link href="/profile" onClick={toggleMenu}>
+            <Link 
+              href="/profile" 
+              onClick={toggleMenu}
+              className="block px-4 py-3 hover:bg-gray-700 rounded transition font-light"
+            >
               Profile
             </Link>
           </li>
           <li>
-            <Link href="/logout" onClick={toggleMenu}>
+            <Link 
+              href="/logout" 
+              onClick={toggleMenu}
+              className="block px-4 py-3 hover:bg-gray-700 rounded transition font-light"
+            >
               Logout
             </Link>
           </li>
