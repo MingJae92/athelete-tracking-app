@@ -1,16 +1,16 @@
-import Navbar from "@/app/components/Navbar";
-import Hero from "@/app/components/Hero";
 import FeatureCard from "@/app/components/FeatureCard";
 import Footer from "@/app/components/Footer";
+import Hero from "@/app/components/Hero";
+import Navbar from "@/app/components/Navbar";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       <Navbar />
-      
-      <main className="bg-gray-100 flex-grow">
+
+      <main className="bg-gray-100 flex-grow pt-20">
         <Hero />
-        
+
         {/* Feature Cards Section */}
         <section className="py-12">
           <div className="max-w-6xl mx-auto px-8">
@@ -31,7 +31,7 @@ export default function Home() {
           </div>
         </section>
       </main>
-      
+
       <Footer />
     </div>
   );
