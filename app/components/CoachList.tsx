@@ -1,35 +1,30 @@
 'use client';
 
-interface Coach {
+import { useMemo, useState } from 'react';
+
+export interface Coach {
   id: string;
   name: string;
-  specialty: string;
-  secondary?: string;
-  nextSlot?: string;
+  speciality: string;
+  sport: string;
+  timezone: string;
+  nextAvailableSlot?: string;
 }
 
-const coaches: Coach[] = [
-  {
-    id: '1',
-    name: 'Aisha Khan',
-    specialty: 'Strength & Conditioning',
-    secondary: 'Running',
-    nextSlot: 'Jan 6, 09:00',
-  },
-  {
-    id: '2',
-    name: 'John Miller',
-    specialty: 'Swimming Coach',
-    nextSlot: 'Jan 7, 11:00',
-  },
-  {
-    id: '3',
-    name: 'Grace Okoye',
-    specialty: 'Sprint Specialist',
-  },
-];
+interface CoachListProps {
+  coaches: Coach[];
+}
 
-export default function CoachList() {
+export default function CoachList({ coaches }: CoachListProps) {
+  const [search, setSearch] = useState('');
+  const [selectedCoachId, setSelectedCoachId] = useState<string | null>(null);
+
+  const filteredCoaches = useMemo(() => {
+    return coaches.filter((coach) =>
+      coach.name.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [coaches, search]);
+
   return (
     <div className="bg-white border border-gray-300 p-6">
       {/* Header */}
@@ -43,7 +38,11 @@ export default function CoachList() {
             strokeWidth="2"
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         </button>
       </div>
@@ -51,45 +50,53 @@ export default function CoachList() {
       {/* Search */}
       <input
         type="text"
-        placeholder="Search coaches..."
+        placeholder="Search by coach name..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
         className="w-full border border-gray-300 px-4 py-2 mb-6 focus:outline-none focus:border-gray-400 text-gray-700 font-light"
       />
 
-      {/* Coach Cards */}
+      {/* Empty state */}
+      {filteredCoaches.length === 0 && (
+        <p className="text-gray-600 font-light">No coaches found</p>
+      )}
+
+      {/* Coach List */}
       <div className="space-y-4">
-        {coaches.map((coach) => (
-          <div
-            key={coach.id}
-            className="border border-gray-200 p-4 cursor-pointer hover:bg-gray-50 transition"
-          >
-            <h3 className="text-lg font-light text-gray-700 mb-1">
-              {coach.name}
-            </h3>
+        {filteredCoaches.map((coach) => {
+          const isSelected = coach.id === selectedCoachId;
 
-            <p className="text-gray-600 font-light text-sm">
-              {coach.specialty}
-            </p>
+          return (
+            <div
+              key={coach.id}
+              onClick={() => setSelectedCoachId(coach.id)}
+              className={`border p-4 cursor-pointer transition
+                ${isSelected
+                  ? 'border-gray-500 bg-gray-50'
+                  : 'border-gray-200 hover:bg-gray-50'
+                }
+              `}
+            >
+              <h3 className="text-lg font-light text-gray-700 mb-1">
+                {coach.name}
+              </h3>
 
-            {coach.secondary && (
-              <p className="text-gray-600 font-light text-sm">
-                {coach.secondary}
+              <p className="text-sm text-gray-600 font-light">
+                {coach.speciality}
               </p>
-            )}
 
-            {coach.nextSlot && (
-              <p className="text-sm text-gray-600 font-light mt-2">
-                Next slot: {coach.nextSlot}
+              <p className="text-sm text-gray-600 font-light">
+                Sport: {coach.sport}
               </p>
-            )}
-          </div>
-        ))}
-      </div>
 
-      {/* States */}
-      <div className="mt-8 text-sm text-gray-600 font-light space-y-2">
-        <p>Loading...</p>
-        <p>No coaches found</p>
-        <p className="italic">Error: Failed to load coaches</p>
+              {coach.nextAvailableSlot && (
+                <p className="text-sm text-gray-600 font-light mt-2">
+                  Next slot: {coach.nextAvailableSlot}
+                </p>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
