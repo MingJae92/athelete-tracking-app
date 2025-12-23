@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function NavBar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
