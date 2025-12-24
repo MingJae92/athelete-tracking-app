@@ -55,7 +55,10 @@ It allows users to view coaches, filter by availability, create sessions with at
 
 ## Getting Started
 
+Git clone project---> npm i ---> npm run dev, then the application will load. 
+
 First, run the development server:
+
 
 ```bash
 npm run dev
