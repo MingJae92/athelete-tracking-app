@@ -55,7 +55,7 @@ It allows users to view coaches, filter by availability, create sessions with at
 
 ## Getting Started
 
-Git clone project---> npm i ---> npm run dev, then the application will load. 
+Git clone project---> npm i ---> npm run dev, then the application will load to http://localhost:3000/
 
 First, run the development server:
 
