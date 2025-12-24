@@ -1,4 +1,57 @@
+# Cloudathlete – Coach Scheduling Tool
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+It allows users to view coaches, filter by availability, create sessions with athletes, and manage scheduling. This project emphasizes accessibility, responsive design, and modular React components.
+
+---
+
+## Key Assumptions / Trade-offs
+
+1. **Static Data for Coaches and Athletes**  
+   - Coaches and athletes currently come from an in-memory store for simplicity.  
+   - Trade-off: Fast development and testing, but not persistent or scalable.
+
+2. **Session Creation is Synchronous**  
+   - Sessions update the UI immediately.  
+   - Trade-off: Quick feedback, but lacks backend validation and persistence.
+
+3. **Client-Side Filtering and Responsiveness**  
+   - Filtering by coach/date is handled on the client.  
+   - Trade-off: Works well for small datasets, but may be slow for large datasets.
+
+4. **Accessibility Enhancements**  
+   - Basic ARIA roles, labels, and keyboard navigation applied.  
+   - Trade-off: Covers common use cases, but not exhaustively tested on all assistive technologies.
+
+5. **Testing**  
+   - Unit and component tests implemented with **React Testing Library / Vitest** for core components (`CoachDetail`, `SessionsPage`, `FeatureCard`).  
+   - Trade-off: Covers key functionality, but not all edge cases.
+
+---
+
+## What Could Be Improved with More Time
+
+1. **Backend & Persistence**  
+   - Add **Prisma** + database persistence for coaches, athletes, and sessions.  
+   - Implement ability to **cancel a session and free the slot**.
+
+2. **Optimistic UI Updates**  
+   - Reflect changes immediately in the UI while awaiting API responses.
+
+3. **Enhanced Athlete Selection**  
+   - Add **search within multi-select** for choosing athletes efficiently.
+
+4. **Conflict Detection & Validation**  
+   - Detect **time conflicts** for coaches/athletes when creating or editing sessions.
+
+5. **Scalability & UX Enhancements**  
+   - Server-side filtering/pagination, calendar-based slot selection, mobile-friendly layouts, and visual feedback animations.
+
+6. **Expanded Testing**  
+   - Add integration and end-to-end tests for workflows like creating/cancelling sessions, filtering coaches, and modal interactions.
+
+---
 
 ## Getting Started
 
@@ -12,25 +65,3 @@ yarn dev
 pnpm dev
 # or
 bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
