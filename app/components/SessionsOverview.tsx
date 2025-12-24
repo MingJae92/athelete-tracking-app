@@ -58,8 +58,10 @@ export default function SessionsPage() {
   if (loading) return <p className="text-center mt-10">Loading sessions...</p>;
 
   return (
-    <div className="max-w-5xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Upcoming Sessions</h1>
+    <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center sm:text-left">
+        Upcoming Sessions
+      </h1>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -70,7 +72,7 @@ export default function SessionsPage() {
           placeholder="Filter by coach name..."
           value={filterCoach}
           onChange={(e) => setFilterCoach(e.target.value)}
-          className="border rounded px-2 py-1 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="border rounded px-2 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
         />
 
         <label className="sr-only" htmlFor="filter-date">Filter by date</label>
@@ -79,14 +81,14 @@ export default function SessionsPage() {
           type="date"
           value={filterDate}
           onChange={(e) => setFilterDate(e.target.value)}
-          className="border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="border rounded px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
         />
       </div>
 
       {/* Sessions List */}
       <div className="space-y-4">
         {filteredSessions.length === 0 && (
-          <p className="text-gray-500">No sessions found.</p>
+          <p className="text-gray-500 text-center">No sessions found.</p>
         )}
 
         {filteredSessions.map((session) => {
@@ -95,24 +97,24 @@ export default function SessionsPage() {
           return (
             <div
               key={session.id}
-              tabIndex={0} // focusable for keyboard
-              className={`border rounded p-4 shadow-sm hover:shadow-md transition cursor-pointer ${isToday ? 'bg-yellow-50' : 'bg-white'}`}
+              tabIndex={0}
+              className={`border rounded p-4 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col sm:flex-row sm:justify-between sm:items-center ${isToday ? 'bg-yellow-50' : 'bg-white'}`}
               onClick={() => setSelectedSession(session)}
               onKeyDown={(e) => e.key === 'Enter' && setSelectedSession(session)}
               aria-label={`Session with ${getCoachName(session.coachId)} on ${new Date(session.createdAt).toLocaleString()}`}
             >
-              <div className="flex justify-between mb-2">
-                <span className="font-semibold">{new Date(session.createdAt).toLocaleString()}</span>
-                <span className="italic">{getCoachName(session.coachId)}</span>
+              <div className="mb-2 sm:mb-0">
+                <span className="font-semibold block">{new Date(session.createdAt).toLocaleString()}</span>
+                <span className="italic text-sm sm:text-base">{getCoachName(session.coachId)}</span>
               </div>
-              <div className="mb-2">
+              <div>
                 <strong>Athletes ({session.athleteIds.length}):</strong> {getAthleteNames(session.athleteIds)}
+                {session.notes && (
+                  <div className="text-gray-600 text-sm mt-1 sm:mt-0">
+                    <strong>Notes:</strong> {session.notes}
+                  </div>
+                )}
               </div>
-              {session.notes && (
-                <div className="text-gray-600">
-                  <strong>Notes:</strong> {session.notes}
-                </div>
-              )}
             </div>
           );
         })}

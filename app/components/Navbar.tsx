@@ -9,12 +9,12 @@ export default function NavBar() {
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="flex items-center justify-between px-6 h-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         {/* Logo */}
         <div className="flex-1">
           <Link
             href="/"
-            className="text-xl font-light text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="text-xl font-light text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
             aria-label="Cloudathlete Home"
           >
             Cloudathlete
