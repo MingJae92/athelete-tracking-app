@@ -27,6 +27,7 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
+    // Map coach slots to availability
     const mappedSlots: TimeSlot[] = coach.slots.map((slotId) => {
       const slot = getSlotsByCoach(coach.id).find((s) => s.id === slotId);
       return {
@@ -35,6 +36,8 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
       };
     });
     setSlots(mappedSlots);
+
+    // Fetch athletes
     setAthletes(getAthletes());
   }, [coach]);
 
@@ -47,6 +50,7 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
   const handleCreateSession = () => {
     setError('');
     setSuccess('');
+
     if (!selectedSlot) return setError('Select a slot');
     if (selectedAthletes.length === 0) return setError('Select at least one athlete');
 
@@ -71,19 +75,19 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
   };
 
   return (
-    <div className="bg-white border border-gray-300 p-4 sm:p-6 rounded shadow space-y-6 max-w-3xl mx-auto">
+    <div className="bg-white border border-gray-300 p-6 rounded shadow space-y-6">
       {/* Coach Profile */}
-      <div className="space-y-1">
+      <div>
         <h2 className="text-2xl font-semibold">{coach.name}</h2>
-        <p className="text-gray-600 text-sm">Speciality: {coach.speciality}</p>
-        <p className="text-gray-600 text-sm">Sport: {coach.sport}</p>
-        <p className="text-gray-600 text-sm">Timezone: {coach.timezone}</p>
+        <p className="text-gray-600">Speciality: {coach.speciality}</p>
+        <p className="text-gray-600">Sport: {coach.sport}</p>
+        <p className="text-gray-600">Timezone: {coach.timezone}</p>
       </div>
 
       {/* Availability */}
       <div>
         <h3 className="font-semibold mb-2">Availability</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {slots.map((slot) => (
             <button
               key={slot.id}
@@ -93,7 +97,7 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
                 ${slot.status === 'Booked' ? 'bg-red-100 text-red-600 cursor-not-allowed' : ''}
                 ${selectedSlot === slot.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
               `}
-              aria-pressed={selectedSlot === slot.id}
+              aria-pressed={selectedSlot === slot.id} // ✅ accessibility for toggle
             >
               {slot.id} {slot.status === 'Booked' ? '(Booked)' : ''}
             </button>
@@ -101,10 +105,10 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
         </div>
       </div>
 
-      {/* Athletes & Notes */}
+      {/* Create Session */}
       <div>
         <h3 className="font-semibold mb-2">Athletes</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+        <div className="space-y-2 mb-4">
           {athletes.map((ath) => (
             <label key={ath.id} className="flex items-center cursor-pointer">
               <input
@@ -112,20 +116,20 @@ export default function CoachDetail({ coach }: CoachDetailProps) {
                 checked={selectedAthletes.includes(ath.id)}
                 onChange={() => handleAthleteToggle(ath.id)}
                 className="w-4 h-4 border-gray-300 mr-2"
-                aria-checked={selectedAthletes.includes(ath.id)}
+                aria-checked={selectedAthletes.includes(ath.id)} // ✅ accessibility
               />
-              <span className="text-sm">{ath.name}</span>
+              {ath.name}
             </label>
           ))}
         </div>
 
-        <label htmlFor="notes" className="sr-only">Notes</label>
+        <label htmlFor="notes" className="sr-only">Notes</label> {/* ✅ screen reader label */}
         <textarea
           id="notes"
           placeholder="Notes (optional)..."
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full border border-gray-300 px-3 py-2 mb-4 rounded focus:outline-none focus:border-gray-400 text-sm"
+          className="w-full border border-gray-300 px-3 py-2 mb-4 rounded focus:outline-none focus:border-gray-400"
           rows={3}
         />
 
